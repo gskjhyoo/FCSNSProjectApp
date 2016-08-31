@@ -13,7 +13,6 @@ public class UtilSPrefer {
         return instance;
     }
 
-
     /*instance 사용하지 않아도 되는 구조*/
     public static SharedPreferences getSharedPreference(Context _cContext, String _strPreferKey){
         return _cContext.getSharedPreferences(_strPreferKey, Context.MODE_PRIVATE);
