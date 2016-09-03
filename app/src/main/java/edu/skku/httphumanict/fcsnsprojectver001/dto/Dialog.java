@@ -3,6 +3,8 @@ package edu.skku.httphumanict.fcsnsprojectver001.dto;
 import java.util.ArrayList;
 import java.util.Date;
 
+import edu.skku.httphumanict.fcsnsprojectver001.util.UtilGJSON;
+
 /**
  *
  * Created by sk on 2016-08-31.
@@ -38,6 +40,14 @@ public class Dialog {
         sb.append(", checkedIds=").append(checkedIds);
         sb.append('}');
         return sb.toString();
+    }
+
+    /* JSON */
+    public String toJson(){
+        return UtilGJSON.toJSON(this);
+    }
+    public static Dialog fromJson(String _strJSON){
+        return (Dialog) UtilGJSON.fromJSON(_strJSON, Dialog.class);
     }
 
     public String get_id() {

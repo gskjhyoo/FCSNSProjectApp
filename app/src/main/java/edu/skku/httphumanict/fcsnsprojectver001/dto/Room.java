@@ -1,8 +1,9 @@
 package edu.skku.httphumanict.fcsnsprojectver001.dto;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
+
+import edu.skku.httphumanict.fcsnsprojectver001.util.UtilGJSON;
 
 /**
  *
@@ -36,6 +37,14 @@ public class Room {
         sb.append(", savedDialogs=").append(savedDialogs);
         sb.append('}');
         return sb.toString();
+    }
+
+    /* JSON */
+    public String toJson(){
+        return UtilGJSON.toJSON(this);
+    }
+    public static Room fromJson(String _strJSON){
+        return (Room) UtilGJSON.fromJSON(_strJSON, Room.class);
     }
 
     public ArrayList<String> getParticipations() {

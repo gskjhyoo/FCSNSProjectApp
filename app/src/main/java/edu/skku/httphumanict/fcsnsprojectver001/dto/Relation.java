@@ -3,6 +3,8 @@ package edu.skku.httphumanict.fcsnsprojectver001.dto;
 import java.util.ArrayList;
 import java.util.Date;
 
+import edu.skku.httphumanict.fcsnsprojectver001.util.UtilGJSON;
+
 /**
  *
  * Created by sk on 2016-08-31.
@@ -10,6 +12,14 @@ import java.util.Date;
 public class Relation {
     String _id;
     ArrayList<FamilyShip> familyShips;
+
+    /* JSON */
+    public String toJson(){
+        return UtilGJSON.toJSON(this);
+    }
+    public static Relation fromJson(String _strJSON){
+        return (Relation) UtilGJSON.fromJSON(_strJSON, Relation.class);
+    }
 
     class FamilyShip {
         String userId;
@@ -34,6 +44,8 @@ public class Relation {
             sb.append('}');
             return sb.toString();
         }
+
+
 
         public String getUserId() {
             return userId;
