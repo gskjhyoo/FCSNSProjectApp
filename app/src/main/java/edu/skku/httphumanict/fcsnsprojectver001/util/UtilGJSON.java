@@ -4,7 +4,11 @@ import com.google.gson.Gson;
 
 public class UtilGJSON {
 	private static Gson s_cGJSON = new Gson();
-	
+
+	public static Gson getGson(){
+		return s_cGJSON;
+	}
+
 	/*{
 		System.out.print("test - ");
 		s_cGJSON = new Gson();

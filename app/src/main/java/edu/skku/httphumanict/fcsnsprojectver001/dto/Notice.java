@@ -9,7 +9,7 @@ import edu.skku.httphumanict.fcsnsprojectver001.util.UtilGJSON;
  *
  * Created by sk on 2016-08-31.
  */
-public class Notice {
+public class Notice implements FCSNSDTOable {
     String _id;
     String content;
     Date startDate;

@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "334202479837",
+    "firebase_url": "https://fcsnsprojectgcm.firebaseio.com",
+    "project_id": "fcsnsprojectgcm",
+    "storage_bucket": "fcsnsprojectgcm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:334202479837:android:d3f913dcaf88acaa",
+        "android_client_info": {
+          "package_name": "edu.skku.httphumanict.fcsnsprojectver001"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "334202479837-1bb0n8sjbb517jl3gdafs9qrrf4a4i4h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCktK8ok8Wn2Q5dX1cpIGn36U13Cf9LEz0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

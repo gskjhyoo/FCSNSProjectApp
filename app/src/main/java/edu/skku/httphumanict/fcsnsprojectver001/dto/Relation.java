@@ -9,7 +9,7 @@ import edu.skku.httphumanict.fcsnsprojectver001.util.UtilGJSON;
  *
  * Created by sk on 2016-08-31.
  */
-public class Relation {
+public class Relation implements FCSNSDTOable {
     String _id;
     ArrayList<FamilyShip> familyShips;
 
@@ -22,6 +22,9 @@ public class Relation {
     }
 
     class FamilyShip {
+        //! 사용자 아이디로 변경 해야 함.
+        // 사용자 측에서 population 을 이용하여 내부 정보를 끼워 송신할 예정
+        // 동기화 시점은 LogoAcitivity에서 관계를 가져오는 것으로 시작
         String userId;
         String userPhone;
         Date regDate;

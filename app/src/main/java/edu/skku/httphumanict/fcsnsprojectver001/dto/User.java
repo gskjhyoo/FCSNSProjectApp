@@ -8,7 +8,7 @@ import edu.skku.httphumanict.fcsnsprojectver001.util.UtilGJSON;
  *
  * Created by ProLab on 2016-07-26.
  */
-public class User {
+public class User implements FCSNSDTOable {
     String _id;
     String phone;
     String name;

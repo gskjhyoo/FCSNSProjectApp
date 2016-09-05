@@ -9,13 +9,13 @@ import edu.skku.httphumanict.fcsnsprojectver001.util.UtilGJSON;
  *
  * Created by sk on 2016-08-31.
  */
-public class Dialog {
+public class Dialog implements FCSNSDTOable {
     String _id;
     String roomId;
     Date regDate;
     String content;
     String fromId;
-    ArrayList<String> checkedIds;
+    ArrayList<String> checked;
 
     public Dialog(String _id, String roomId, Date regDate, String content, String fromId, ArrayList<String> checkedIds) {
         this._id = _id;
@@ -23,10 +23,22 @@ public class Dialog {
         this.regDate = regDate;
         this.content = content;
         this.fromId = fromId;
-        this.checkedIds = checkedIds;
+        this.checked = checkedIds;
     }
-
+    /**
+     * 일반 방 대화 전달 객체
+     * @param fromId 전달 사용자의 식별 값
+     * @param roomId 방 식별 값
+     * @param content 대화 내용
+     */
+    public Dialog(String fromId, String roomId, String content){
+        this(null, roomId, null, content, fromId, null);
+    }
+    /**
+     * default 생성자
+     */
     public Dialog() {
+        this(null, null, null, null, null, null);
     }
 
     @Override
@@ -37,7 +49,7 @@ public class Dialog {
         sb.append(", regDate=").append(regDate);
         sb.append(", content='").append(content).append('\'');
         sb.append(", fromId='").append(fromId).append('\'');
-        sb.append(", checkedIds=").append(checkedIds);
+        sb.append(", checkedIds=").append(checked);
         sb.append('}');
         return sb.toString();
     }
@@ -81,9 +93,9 @@ public class Dialog {
         this.fromId = fromId;
     }
     public ArrayList<String> getCheckedIds() {
-        return checkedIds;
+        return checked;
     }
     public void setCheckedIds(ArrayList<String> checkedIds) {
-        this.checkedIds = checkedIds;
+        this.checked = checkedIds;
     }
 }// end of class
