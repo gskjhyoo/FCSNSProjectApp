@@ -1,7 +1,5 @@
 package edu.skku.httphumanict.fcsnsprojectver001.app.activity;
 
-import edu.skku.httphumanict.fcsnsprojectver001.R;
-
 /**
  *
  * Created by humaneer on 2016-09-01.

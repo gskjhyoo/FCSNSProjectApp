@@ -114,9 +114,11 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
             finish();
         }
         */
+
         // 2.2 사용자 정보가 있는 경우
         // 사용자 정보를 이용하여 로그인 수행
         User user = User.fromJson(strSavedUserData);
+        /// async request
         loginTask = new ServerLoginAsyncTask();
         FCSNSAppManager.getInstance().setUser(user);
 
@@ -126,10 +128,8 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
 
         Log.d(TAG, String.format("사용자 정보 출력: %s", FCSNSAppManager.getInstance().getUser()));
 
-        // 3. 방 정보 로딩
-        roomDataTask = new ServerRoomDataAsyncTask();
-        dialogDataTask = new ServerDialogDataAsyncTask();
-
+        /// 3. 방 정보 sync
+        // 방 정보 로컬에서 로딩
         Room[] rooms = UtilGJSON.getGson().fromJson(UtilSPrefer.getSharedPreference(this, SP_KEY).getString(SP_KEY_ROOMS, null), Room[].class);
         ArrayList<Room> altRooms = new ArrayList<>();
         if (rooms != null) {
@@ -137,10 +137,17 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
                 altRooms.add(room);
             }
         }
-        // 현재 정보로 저장
+        // 현재 정보로 앱메니저에 설정
         FCSNSAppManager.getInstance().setRooms(altRooms);
+        Log.d(TAG, String.format("로컬 방 정보: %s", FCSNSAppManager.getInstance().getRooms()));
+
         // 서버측에 동기화 수행
+        roomDataTask = new ServerRoomDataAsyncTask();
         roomDataTask.execute(FCSNSAppManager.getInstance().getUser());
+        // 방정보 현재까지 정보로 출력
+
+
+        /*
         // 이후 현재 갱신된 모든 정보 데이터로 저장
         dialogDataTask.execute(FCSNSAppManager.getInstance().getRooms());
 
@@ -156,7 +163,7 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
         // 대화 내용 업데이트 확인 요청
 
         // 해당 내용을 바탕으로 방 액티비티 수행
-
+        */
 
         procTime = procTime - System.currentTimeMillis();
         final FCSNSLogoActivity temp = this;
@@ -201,45 +208,6 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
         }
     };
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "FCSNSLogo Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app URL is correct.
-                Uri.parse("android-app://edu.skku.httphumanict.fcsnsprojectver001.app.activity/http/host/path")
-        );
-        AppIndex.AppIndexApi.start(client, viewAction);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "FCSNSLogo Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app URL is correct.
-                Uri.parse("android-app://edu.skku.httphumanict.fcsnsprojectver001.app.activity/http/host/path")
-        );
-        AppIndex.AppIndexApi.end(client, viewAction);
-        client.disconnect();
-    }
 
     /**
      *
@@ -281,7 +249,7 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
     }// end of class
 
     /**
-     *
+     * 비동기 처리 이후 모든 요소가
      */
     public class ServerRoomDataAsyncTask extends AsyncTask<User, Void, Void> {
 
@@ -294,30 +262,53 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
             try {
                 // 대화방 정보를 갱신한다.
                 Gson gson = UtilGJSON.getGson();
+                //String strRequestURL = URL_APP_SERVER +
+                // 수신 정보 조회
+                strResData = UtilHttp.getInstance().getURL(URL_APP_SERVER + String.format("/user/%s/has/rooms", user.get_id()));
 
-                strResData = UtilHttp.getInstance().getURL(URL_APP_SERVER + String.format("/user/%s/room/find", "_id", user.get_id()));
+                Log.d(TAG, String.format("사용자 방 정보 조회 수신 데이터: %s", strResData));
+
+
+                // 수신이 불량한 경우
+                if(strResData == null || strResData.isEmpty() || strResData.contains("err") || !strResData.contains("data")){
+                    Log.d(TAG, "수신 정보 불량");
+                    return null;
+                }
+
+
 
                 LinkedTreeMap resData = gson.fromJson(strResData, LinkedTreeMap.class);
-                // 수신 정보 조회
-                Room[] rooms = gson.fromJson(gson.toJson(resData.get("data")), Room[].class);
+
+                Room[] cArrRcvRooms = gson.fromJson(gson.toJson(resData.get("data")), Room[].class);
+                // 파싱 결과 확인
+                //Log.d(TAG,  )
+
                 ArrayList<Integer> altIndex = new ArrayList<>();
-                for (int i = 0; i < rooms.length; i++) {
+                for (int i = 0; i < cArrRcvRooms.length; i++) {
                     // 현재 저장되어 있는 room 객체 정보 갱신해야함.
                     boolean isEqual = false;
-                    for (Room orgRoom : FCSNSAppManager.getInstance().getRooms()) {
-                        if (orgRoom.get_id().equals(rooms[i].get_id())) {
+
+                    // 같은 방 있는 경우 최신으로 갱신
+                    for (int j = 0; i < FCSNSAppManager.getInstance().getRooms().size(); j++) {
+                        if (FCSNSAppManager.getInstance().getRooms().get(j).get_id().equals(cArrRcvRooms[i].get_id())) {
                             isEqual = true;
-                            orgRoom = rooms[i];
+                            FCSNSAppManager.getInstance().getRooms().set(j, cArrRcvRooms[i]);
                             break;
                         }
                     }
+                    // 같은게 없는 경우 삽입을 수행한다
                     if (!isEqual)
                         altIndex.add(i);
+
                 }
+                Log.d(TAG, String.format("방 새로 추가된 인덱스: %s", altIndex.toString()));
                 // 없는 인자들만 모아서 새로히 삽입 처리
                 for (int idx : altIndex) {
-                    FCSNSAppManager.getInstance().getRooms().add(rooms[idx]);
+                    Log.d(TAG, String.format("방 새로 추되는 요소: %s", cArrRcvRooms[idx]));
+                    FCSNSAppManager.getInstance().getRooms().add(cArrRcvRooms[idx]);
                 }
+                Log.d(TAG, String.format("서버 측에서 갱신한 방 정보: %s", FCSNSAppManager.getInstance().getRooms()));
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -336,7 +327,9 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
                 for (Room room : lstRooms) {
                     // room /room/:id/contained/dialogs
                     strResData = UtilHttp.getInstance().getURL(String.format(URL_APP_SERVER
-                            + "/room/%s/contained/dialogs", "_id", room.get_id()));
+                            + "/room/%s/contained/dialogs", room.get_id()));
+                    // 각 URL 요청 수행
+
                     LinkedTreeMap resData = gson.fromJson(strResData, LinkedTreeMap.class);
                     Dialog[] dialogs = gson.fromJson(gson.toJson(resData.get("data")), Dialog[].class);
                     // 현재 있는 갯수와 새로 받은 갯수 비교
