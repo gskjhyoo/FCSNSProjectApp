@@ -171,6 +171,10 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
                     finish();
                 }
             }, 1000 - procTime);
+        } else {
+            Intent intent = new Intent(temp.getApplicationContext(), FCSNSRoomActivity.class);
+            startActivity(intent);
+            finish();
         }
 
        /* Intent intent = new Intent(this, FCSNSRoomActivity.class);
@@ -291,8 +295,7 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
                 // 대화방 정보를 갱신한다.
                 Gson gson = UtilGJSON.getGson();
 
-                strResData = UtilHttp.getInstance().getURL(String.format(URL_APP_SERVER
-                        + "/user/%s/room/find", "_id", user.get_id()));
+                strResData = UtilHttp.getInstance().getURL(URL_APP_SERVER + String.format("/user/%s/room/find", "_id", user.get_id()));
 
                 LinkedTreeMap resData = gson.fromJson(strResData, LinkedTreeMap.class);
                 // 수신 정보 조회
