@@ -85,6 +85,13 @@ public class Room implements FCSNSDTOable {
         this.savedDialogs = savedDialogs;
     }
 
+    public void setSync(Room _cRoom){
+        set_id(_cRoom.get_id());
+        setRegDate(_cRoom.getRegDate());
+        setParticipations(_cRoom.getParticipations());
+        setNotices(_cRoom.getNotices());
+    }
+
     class Participant {
         String userId;
         String pushKey;

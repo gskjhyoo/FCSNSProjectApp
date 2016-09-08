@@ -1,12 +1,17 @@
 package edu.skku.httphumanict.fcsnsprojectver001.app;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.skku.httphumanict.fcsnsprojectver001.app.activity.FCSNSLogoActivity;
 import edu.skku.httphumanict.fcsnsprojectver001.app.activity.FCSNSRoomActivity;
+import edu.skku.httphumanict.fcsnsprojectver001.app.activity.FCSNSable;
 import edu.skku.httphumanict.fcsnsprojectver001.dto.Room;
 import edu.skku.httphumanict.fcsnsprojectver001.dto.User;
+import edu.skku.httphumanict.fcsnsprojectver001.util.UtilGJSON;
+import edu.skku.httphumanict.fcsnsprojectver001.util.UtilSPrefer;
 
 /**
  * AppManger
@@ -56,6 +61,13 @@ public class FCSNSAppManager {
     }
     public void setRooms(List<Room> rooms) {
         this.rooms = rooms;
+    }
+
+    public void saveSharedPreference(Context _cContext) {
+        // User 저장
+        UtilSPrefer.saveStrData(_cContext, FCSNSable.SP_KEY, FCSNSable.SP_KEY_USER, getUser().toJson());
+        // Room 배열 정보 저장
+        UtilSPrefer.saveStrData(_cContext, FCSNSable.SP_KEY, FCSNSable.SP_KEY_ROOMS, UtilGJSON.getGson().toJson(getRooms()));
     }
 
     //

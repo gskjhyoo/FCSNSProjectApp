@@ -135,6 +135,9 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
         if (rooms != null) {
             for (Room room : altRooms) {
                 altRooms.add(room);
+                // room dialog 가 null 인 경우 추가
+                if(room.getSavedDialogs() == null)
+                    room.setSavedDialogs(new ArrayList<Dialog>());
             }
         }
         // 현재 정보로 앱메니저에 설정
@@ -144,17 +147,13 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
         // 서버측에 동기화 수행
         roomDataTask = new ServerRoomDataAsyncTask();
         roomDataTask.execute(FCSNSAppManager.getInstance().getUser());
-        // 방정보 현재까지 정보로 출력
 
-
-        /*
         // 이후 현재 갱신된 모든 정보 데이터로 저장
+        dialogDataTask = new ServerDialogDataAsyncTask();
         dialogDataTask.execute(FCSNSAppManager.getInstance().getRooms());
 
         // 갱신된 방 대화 정보 저장
         UtilSPrefer.saveStrData(this, SP_KEY, SP_KEY_USER, UtilGJSON.getGson().toJson(FCSNSAppManager.getInstance().getRooms()));
-
-        Log.d(TAG, String.format("대화 방 정보 출력: %s", FCSNSAppManager.getInstance().getRooms()));
 
 //        String strSavedRoomsData =
         // 4.1 방 정보가 없는 경우
@@ -163,7 +162,6 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
         // 대화 내용 업데이트 확인 요청
 
         // 해당 내용을 바탕으로 방 액티비티 수행
-        */
 
         procTime = procTime - System.currentTimeMillis();
         final FCSNSLogoActivity temp = this;
@@ -175,12 +173,16 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
                     // 1초 이후 실행
                     Intent intent = new Intent(temp.getApplicationContext(), FCSNSRoomActivity.class);
                     startActivity(intent);
+                    // 현재 상태 SharedPreference에 저장
+                    FCSNSAppManager.getInstance().saveSharedPreference(FCSNSLogoActivity.this.getApplicationContext());
                     finish();
                 }
             }, 1000 - procTime);
         } else {
             Intent intent = new Intent(temp.getApplicationContext(), FCSNSRoomActivity.class);
             startActivity(intent);
+            // 현재 상태 SharedPreference에 저장
+            FCSNSAppManager.getInstance().saveSharedPreference(FCSNSLogoActivity.this.getApplicationContext());
             finish();
         }
 
@@ -268,20 +270,13 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
 
                 Log.d(TAG, String.format("사용자 방 정보 조회 수신 데이터: %s", strResData));
 
-
                 // 수신이 불량한 경우
                 if(strResData == null || strResData.isEmpty() || strResData.contains("err") || !strResData.contains("data")){
                     Log.d(TAG, "수신 정보 불량");
                     return null;
                 }
-
-
-
                 LinkedTreeMap resData = gson.fromJson(strResData, LinkedTreeMap.class);
-
                 Room[] cArrRcvRooms = gson.fromJson(gson.toJson(resData.get("data")), Room[].class);
-                // 파싱 결과 확인
-                //Log.d(TAG,  )
 
                 ArrayList<Integer> altIndex = new ArrayList<>();
                 for (int i = 0; i < cArrRcvRooms.length; i++) {
@@ -292,7 +287,7 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
                     for (int j = 0; i < FCSNSAppManager.getInstance().getRooms().size(); j++) {
                         if (FCSNSAppManager.getInstance().getRooms().get(j).get_id().equals(cArrRcvRooms[i].get_id())) {
                             isEqual = true;
-                            FCSNSAppManager.getInstance().getRooms().set(j, cArrRcvRooms[i]);
+                            FCSNSAppManager.getInstance().getRooms().get(j).setSync(cArrRcvRooms[i]);
                             break;
                         }
                     }
@@ -332,18 +327,26 @@ public class FCSNSLogoActivity extends AppCompatActivity implements FCSNSable {
 
                     LinkedTreeMap resData = gson.fromJson(strResData, LinkedTreeMap.class);
                     Dialog[] dialogs = gson.fromJson(gson.toJson(resData.get("data")), Dialog[].class);
+                    Log.d(TAG, String.format("대화 수신 내역 파싱 내용: %s", Arrays.asList(dialogs).toString()));
+                    ArrayList<Dialog> arlDialogs = new ArrayList<>();
+                    for(int i = 0; i < dialogs.length; i++){
+                        arlDialogs.add(dialogs[i]);
+                    }
                     // 현재 있는 갯수와 새로 받은 갯수 비교
                     //! 차후 서버로 부터 갱신 날짜와 갯수 비교를 통해 재요청을 수행하여 정보를 갱신하는 쪽으로 구현 해야 함.
                     //! 지금은 모든 대화를 서버를 통해 받고 이를 비교하는 것으로 함.
-                    if (room.getDialogs().size() != dialogs.length) {
+                    if (room.getDialogs() == null || room.getDialogs().size() != dialogs.length) {
                         // 같지 않은 경우 갱신
-                        room.setDialogs((ArrayList<Dialog>) Arrays.asList(dialogs));
+                        room.setDialogs(arlDialogs);
                     }
                 }
+                Log.d(TAG, String.format("대화 정보 갱신: %s", FCSNSAppManager.getInstance().getRooms()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
             return null;
         }
-    }
+
+
+    }// end of inner class
 }// end of class
