@@ -9,7 +9,7 @@ import edu.skku.httphumanict.fcsnsprojectver001.dto.Room;
 import edu.skku.httphumanict.fcsnsprojectver001.dto.User;
 
 /**
- *
+ * AppManger
  * Created by ProLab on 2016-07-26.
  */
 public class FCSNSAppManager {
